@@ -55,7 +55,7 @@ class AlbumsHandler {
       return {
         status: 'success',
         data: {
-          album: result,
+          album: { ...result.album, songs: result.songs },
         },
       };
     } catch (error) {
