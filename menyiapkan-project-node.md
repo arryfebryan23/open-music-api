@@ -16,6 +16,19 @@
 7. Postgres : npm install pg
 8. Postgres Migration : npm install node-pg-migrate
 9. JOI Data Validation : npm install joi
+11. Config : npm install config
+10. Git Init
 
+# Create DB
+
+- psql -U <username>
+- GRANT ALL PRIVILEGES ON DATABASE companydb TO developer;
+- CREATE DATABASE <db_name>
+- GRANT ALL PRIVILEGES ON <db_name> TO <username_db>
+
+# Create Table with Migration
+- npm run migrate create "create table songs"
+- npm run migrate up
 
 - create server.js
+
