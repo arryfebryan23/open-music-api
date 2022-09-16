@@ -111,6 +111,7 @@ const init = async () => {
       }
 
       // server ERROR!
+      console.error(response);
       const newResponse = h.response({
         status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
