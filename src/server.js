@@ -25,9 +25,22 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+// playlists
+const playlists = require('./api/playlists');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
+const PlaylistsValidator = require('./validator/playlists');
+
+// collaborations
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+const CollaborationsValidator = require('./validator/collaborations');
+
 const init = async () => {
   const authenticationsService = new AuthenticationsService();
+  const songsService = new SongsService();
   const usersService = new UsersService();
+  const collaborationsService = new CollaborationsService(usersService);
+  const playlistsService = new PlaylistsService(songsService, collaborationsService);
 
   const server = Hapi.server({
     port: process.env.PORT || 3000,
@@ -74,7 +87,7 @@ const init = async () => {
     {
       plugin: songs,
       options: {
-        service: new SongsService(),
+        service: songsService,
         validator: SongsValidator,
       },
     },
@@ -83,6 +96,21 @@ const init = async () => {
       options: {
         service: usersService,
         validator: UsersValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        service: playlistsService,
+        validator: PlaylistsValidator,
+      },
+    },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        playlistsService,
+        validator: CollaborationsValidator,
       },
     },
     {
@@ -110,12 +138,16 @@ const init = async () => {
         return newResponse;
       }
 
-      // server ERROR!
-      console.error(response);
+      const { statusCode, payload } = response.output;
+      if (statusCode === 401) {
+        return h.response(payload).code(401);
+      }
+
       const newResponse = h.response({
         status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
+      console.error(response);
       newResponse.code(500);
       return newResponse;
     }
