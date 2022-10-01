@@ -1,7 +1,5 @@
 /* eslint-disable camelcase */
 
-exports.shorthands = undefined;
-
 exports.up = (pgm) => {
   pgm.sql("INSERT INTO albums(id, name, year) VALUES ('old_album', 'old_album', '1999')");
 
