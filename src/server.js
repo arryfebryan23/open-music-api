@@ -3,6 +3,7 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const ClientError = require('./exceptions/ClientError');
+const config = require('./utils/config');
 
 // albums
 const albums = require('./api/albums');
@@ -43,8 +44,8 @@ const init = async () => {
   const playlistsService = new PlaylistsService(songsService, collaborationsService);
 
   const server = Hapi.server({
-    port: process.env.PORT || 3000,
-    host: process.env.HOST || 'localhost',
+    port: config.app.port || 3000,
+    host: config.app.host || 'localhost',
     routes: {
       cors: {
         origin: ['*'],
@@ -61,12 +62,12 @@ const init = async () => {
 
   // mendefinisikan strategy autentikasi jwt
   server.auth.strategy('openmusic_jwt', 'jwt', {
-    keys: process.env.ACCESS_TOKEN_KEY,
+    keys: config.token.access.key,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+      maxAgeSec: config.token.access.age,
     },
     validate: (artifacts) => ({
       isValid: true,
