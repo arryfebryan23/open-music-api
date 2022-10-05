@@ -22,7 +22,7 @@ class ExportsHandler {
       playlistId,
     };
 
-    await this._service.sendMessage('export:playlists', JSON.stringify(message));
+    await this._service.sendMessage('export:playlists', message);
 
     const response = h.response(
       {

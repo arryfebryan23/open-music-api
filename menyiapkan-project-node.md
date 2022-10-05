@@ -1,6 +1,6 @@
 1. Init NPM : npm init -y
-2. Nodemon : npm install nodemen --save-dev
-4. ESLint : npm install eslint --save-dev
+2. Nodemon : npm install nodemen *--save-dev*
+4. ESLint : npm install eslint *--save-dev*
     - npx eslint --init
     - setting eslintrc.json
     
@@ -16,8 +16,9 @@
 7. Postgres : npm install pg
 8. Postgres Migration : npm install node-pg-migrate
 9. JOI Data Validation : npm install joi
-11. Config : npm install config
 10. Git Init
+11. Config : npm install config
+12. RabbitMQ amqplib : npm install amqplib
 
 # Create DB
 
