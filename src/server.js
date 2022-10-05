@@ -37,10 +37,16 @@ const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');
 
+// exports
 const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+// Likes
+const likesAlbum = require('./api/likesAlbum');
+const LikesAlbumService = require('./services/postgres/LikesAlbumService');
+
+// cache redis
 const CacheService = require('./services/redis/CacheService');
 
 // AWS S3 Services
@@ -54,7 +60,8 @@ const init = async () => {
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService(usersService);
   const playlistsService = new PlaylistsService(songsService, collaborationsService);
-  const albumsService = new AlbumsService(storageService, cacheService);
+  const albumsService = new AlbumsService(storageService);
+  const likesAlbumService = new LikesAlbumService(albumsService, cacheService);
 
   const server = Hapi.server({
     port: config.app.port || 3000,
@@ -145,6 +152,12 @@ const init = async () => {
         service: ProducerService,
         validator: ExportsValidator,
         playlistsService,
+      },
+    },
+    {
+      plugin: likesAlbum,
+      options: {
+        service: likesAlbumService,
       },
     },
   ]);
