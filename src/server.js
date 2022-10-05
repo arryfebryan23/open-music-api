@@ -41,17 +41,20 @@ const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+const CacheService = require('./services/redis/CacheService');
+
 // AWS S3 Services
 const StorageService = require('./services/S3/StoragesService');
 
 const init = async () => {
+  const cacheService = new CacheService();
   const storageService = new StorageService();
   const authenticationsService = new AuthenticationsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService(usersService);
   const playlistsService = new PlaylistsService(songsService, collaborationsService);
-  const albumsService = new AlbumsService(storageService);
+  const albumsService = new AlbumsService(storageService, cacheService);
 
   const server = Hapi.server({
     port: config.app.port || 3000,
@@ -173,6 +176,7 @@ const init = async () => {
         status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
+      // eslint-disable-next-line no-console
       console.error(response);
       newResponse.code(500);
       return newResponse;
@@ -182,6 +186,7 @@ const init = async () => {
   });
 
   await server.start();
+  // eslint-disable-next-line no-console
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
 
