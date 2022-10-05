@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
 const ClientError = require('./exceptions/ClientError');
 const config = require('./utils/config');
 
@@ -40,12 +41,17 @@ const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+// AWS S3 Services
+const StorageService = require('./services/S3/StoragesService');
+
 const init = async () => {
+  const storageService = new StorageService();
   const authenticationsService = new AuthenticationsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService(usersService);
   const playlistsService = new PlaylistsService(songsService, collaborationsService);
+  const albumsService = new AlbumsService(storageService);
 
   const server = Hapi.server({
     port: config.app.port || 3000,
@@ -61,6 +67,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
@@ -85,7 +94,7 @@ const init = async () => {
     {
       plugin: albums,
       options: {
-        service: new AlbumsService(),
+        service: albumsService,
         validator: AlbumsValidator,
       },
     },
@@ -154,6 +163,10 @@ const init = async () => {
       const { statusCode, payload } = response.output;
       if (statusCode === 401) {
         return h.response(payload).code(401);
+      }
+
+      if (statusCode === 413) {
+        return h.response(payload).code(413);
       }
 
       const newResponse = h.response({

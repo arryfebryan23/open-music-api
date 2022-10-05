@@ -4,8 +4,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 class AlbumsService {
-  constructor() {
+  constructor(StoragesService) {
     this._pool = new Pool();
+    this._storagesService = StoragesService;
   }
 
   async addAlbum({ name, year }) {
@@ -27,7 +28,7 @@ class AlbumsService {
 
   async getAlbumById(id) {
     let query = {
-      text: 'SELECT id, name, year FROM albums WHERE id = $1',
+      text: 'SELECT id, name, year, cover AS "coverUrl" FROM albums WHERE id = $1',
       values: [id],
     };
 
@@ -75,6 +76,23 @@ class AlbumsService {
     if (!result.rowCount) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
+  }
+
+  async writeAlbumCoverImage(imageCover, albumId) {
+    const filename = await this._storagesService.writeFile(imageCover, imageCover.hapi);
+
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+      values: [filename, albumId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
+    }
+
+    return filename;
   }
 }
 

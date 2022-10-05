@@ -19,6 +19,8 @@
 10. Git Init
 11. Config : npm install config
 12. RabbitMQ amqplib : npm install amqplib
+13. @hapi/inert : npm install @hapi/inert *access static file*
+14. aws-sdk : npm install aws-sdk *upload file to AWS S3*
 
 # Create DB
 
