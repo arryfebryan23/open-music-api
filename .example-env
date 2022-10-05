@@ -1,0 +1,18 @@
+# server configuration
+HOST=
+PORT=
+ 
+# node-postgres configuration or u can use config file
+PGUSER=
+PGHOST=
+PGPASSWORD=
+PGDATABASE=
+PGPORT=
+
+# jwt configuration
+ACCESS_TOKEN_KEY=
+REFRESH_TOKEN_KEY=
+ACCESS_TOKEN_AGE=
+
+# rabbitmq configuration
+RABBITMQ_SERVER=
