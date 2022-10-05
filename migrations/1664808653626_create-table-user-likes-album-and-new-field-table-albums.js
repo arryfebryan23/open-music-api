@@ -3,7 +3,7 @@
 exports.up = (pgm) => {
   pgm.createTable('user_album_likes', {
     id: {
-      type: 'VARCHAR(50)',
+      type: 'serial',
       primaryKey: true,
     },
     user_id: {
@@ -23,6 +23,7 @@ exports.up = (pgm) => {
     },
   });
 
+  pgm.addConstraint('user_album_likes', 'unique_user_id_and_album_id', 'UNIQUE(user_id, album_id)');
   pgm.addConstraint('user_album_likes', 'fk_user_album_likes.user_id.users.id', 'FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE');
   pgm.addConstraint('user_album_likes', 'fk_user_album_likes.album_id.albums.id', 'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE');
 };
